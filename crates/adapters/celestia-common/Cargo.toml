@@ -45,6 +45,9 @@ tracing = { workspace = true }
 
 [dev-dependencies]
 sov-celestia-common = { path = ".", features = ["native", "arbitrary"] }
+sov-test-utils = { workspace = true, features = ["arbitrary"] }
+reltester = { workspace = true }
+test-strategy = { workspace = true }
 
 [features]
 default = []
@@ -64,5 +67,6 @@ arbitrary = [
     "dep:arbitrary",
     "dep:proptest",
     "sov-rollup-interface/arbitrary",
+    "sov-test-utils/arbitrary",
     "sov-celestia-common/arbitrary",
 ]

@@ -211,3 +211,27 @@ pub fn flatten_timeout<T>(
         Err(_) => Err(MaybeRetryable::Transient(anyhow::anyhow!("await timeout"))),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::VerifyOnFetchMode;
+
+    #[test]
+    fn verify_on_fetch_off_does_not_run_the_check() {
+        let mut ran = false;
+        apply_verify_on_fetch(VerifyOnFetchMode::Off, 1, || {
+            ran = true;
+            Ok(())
+        })
+        .unwrap();
+        assert!(!ran);
+
+        apply_verify_on_fetch(VerifyOnFetchMode::ReturnError, 2, || {
+            ran = true;
+            Ok(())
+        })
+        .unwrap();
+        assert!(ran);
+    }
+}
