@@ -112,3 +112,29 @@ impl fmt::Debug for CelestiaFibreConfig {
             .finish_non_exhaustive()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn defaults_and_debug_redact_secrets() {
+        let config: CelestiaFibreConfig = serde_json::from_str(
+            r#"{"rpc_url":"ws://localhost:26658","signer_private_key":"abcdabcd","rpc_auth_token":"secret-token"}"#,
+        )
+        .unwrap();
+        assert_eq!(config.download_timeout_secs.get(), 120);
+        assert_eq!(config.request_timeout_secs.get(), 20);
+        let rendered = format!("{config:?}");
+        assert!(rendered.contains("REDACTED"));
+        assert!(!rendered.contains("abcdabcd"));
+        assert!(!rendered.contains("secret-token"));
+    }
+
+    #[test]
+    fn missing_signer_is_read_only() {
+        let config: CelestiaFibreConfig =
+            serde_json::from_str(r#"{"rpc_url":"ws://localhost:26658"}"#).unwrap();
+        assert!(config.signing_key().unwrap().is_none());
+    }
+}
